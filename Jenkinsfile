@@ -68,7 +68,7 @@ pipeline {
                       -p 3000:3000 ^
                       %FULL_IMAGE%
 
-                    timeout /t 5 /nobreak
+                    powershell -Command "Start-Sleep -Seconds 5" 
                 '''
             }
         }
