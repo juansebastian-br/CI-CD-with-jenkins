@@ -158,32 +158,7 @@ Para que Docker funcione realmente, el agente Jenkins debe disponer de acceso al
 
 ## Evidencias
 
-### GitHub Actions
-
-Capturar:
-
-- Nombre del workflow.
-- Ejecucion asociada a un commit.
-- Steps en estado correcto.
-
-Guardar como:
-
-```text
-capturas/github-actions-ci.png
-```
-
-### Jenkins
-
-Capturar:
-
-- Stage View o Pipeline Steps.
-- Los stages del `Jenkinsfile`.
-
-Guardar como:
-
-```text
-capturas/jenkins-cd.png
-```
+### Pueden ser consultadas en la sección de Capturas
 
 ## Entregables incluidos
 

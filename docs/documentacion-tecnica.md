@@ -105,38 +105,10 @@ El Jenkinsfile parametriza:
 - registro Docker,
 - nombre de imagen.
 
-Por ello la definicion puede reutilizarse con Docker Hub, OCI Container Registry, GitHub Container Registry u otros registros compatibles.
+Por ello la definicion puede reutilizarse con Docker Desktop/HUB, GitHub Container Registry u otros registros compatibles.
 
-## 6. Integracion futura con Argo CD
 
-Una evolucion natural del laboratorio es aplicar GitOps:
-
-```text
-Developer
-   |
-   v
-GitHub
-   |
-   +--> GitHub Actions: test/validate
-   |
-   +--> Jenkins: build/push image
-                    |
-                    v
-              Container Registry
-                    |
-                    v
-             Git manifests repo
-                    |
-                    v
-                 Argo CD
-                    |
-                    v
-                Kubernetes
-```
-
-Jenkins construiria el artefacto y actualizaria la version de imagen en un repositorio de manifiestos. Argo CD seria responsable de sincronizar el estado deseado con Kubernetes.
-
-## 7. Seguridad
+## 6. Seguridad
 
 Se aplican las siguientes medidas:
 
@@ -145,17 +117,6 @@ Se aplican las siguientes medidas:
 - `docker login --password-stdin`.
 - Workflow GitHub con `contents: read`.
 - Pruebas y lint antes de validar la imagen.
-
-## 8. Evidencias de entrega
-
-Adjuntar:
-
-1. URL del repositorio GitHub.
-2. Captura de GitHub Actions.
-3. Captura de Jenkins.
-4. Archivos de configuracion.
-5. README o este documento Markdown.
-
 
 ## Variante Jenkins localhost
 
