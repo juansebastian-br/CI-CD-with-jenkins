@@ -22,7 +22,7 @@ pipeline {
     }
 
     environment {
-        PATH = "C:\\Program Files\\Docker\\Docker\\resources\\bin;${env.PATH}"
+        PATH = "C:\\Users\\ROGELIO\\AppData\\Local\\Programs\\DockerDesktop\\resources\\bin;${env.PATH}"
     }   
 
 
