@@ -21,7 +21,22 @@ pipeline {
         )
     }
 
+    environment {
+        PATH = "C:\\Program Files\\Docker\\Docker\\resources\\bin;${env.PATH}"
+    }   
+
+
     stages {
+
+        stage('Check Docker') {
+            steps {
+                bat '''
+                    where docker
+                    docker --version
+                    docker info
+                '''
+            }
+        }
 
         stage('Check environment') {
             steps {
