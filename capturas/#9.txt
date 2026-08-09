@@ -1,0 +1,272 @@
+Lanzada por el usuario Sebastian Buitrago
+Obtained Jenkinsfile from git https://github.com/juansebastian-br/CI-CD-with-jenkins.git
+[Pipeline] Start of Pipeline
+[Pipeline] node
+Running on Jenkins  in C:\ProgramData\Jenkins\.jenkins\workspace\WebAppPipeline
+[Pipeline] {
+[Pipeline] stage
+[Pipeline] { (Declarative: Checkout SCM)
+[Pipeline] checkout
+Selected Git installation does not exist. Using Default
+The recommended git tool is: NONE
+No credentials specified
+ > git.exe rev-parse --resolve-git-dir C:\ProgramData\Jenkins\.jenkins\workspace\WebAppPipeline\.git # timeout=10
+Fetching changes from the remote Git repository
+ > git.exe config remote.origin.url https://github.com/juansebastian-br/CI-CD-with-jenkins.git # timeout=10
+Fetching upstream changes from https://github.com/juansebastian-br/CI-CD-with-jenkins.git
+ > git.exe --version # timeout=10
+ > git --version # 'git version 2.54.0.windows.1'
+ > git.exe fetch --tags --force --progress -- https://github.com/juansebastian-br/CI-CD-with-jenkins.git +refs/heads/*:refs/remotes/origin/* # timeout=10
+ > git.exe rev-parse "refs/remotes/origin/main^{commit}" # timeout=10
+Checking out Revision d12ddc254ba0cff0d4f4b1f2dc08ee2264df8a38 (refs/remotes/origin/main)
+ > git.exe config core.sparsecheckout # timeout=10
+ > git.exe checkout -f d12ddc254ba0cff0d4f4b1f2dc08ee2264df8a38 # timeout=10
+Commit message: "Correction on stage run container locally"
+ > git.exe rev-list --no-walk 6cc87101591a4201a001b40f8b002a6c992ac1df # timeout=10
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] withEnv
+[Pipeline] {
+[Pipeline] withEnv
+[Pipeline] {
+[Pipeline] stage
+[Pipeline] { (Clone repository)
+[Pipeline] git
+Selected Git installation does not exist. Using Default
+The recommended git tool is: NONE
+No credentials specified
+ > git.exe rev-parse --resolve-git-dir C:\ProgramData\Jenkins\.jenkins\workspace\WebAppPipeline\.git # timeout=10
+Fetching changes from the remote Git repository
+ > git.exe config remote.origin.url https://github.com/juansebastian-br/CI-CD-with-jenkins.git # timeout=10
+Fetching upstream changes from https://github.com/juansebastian-br/CI-CD-with-jenkins.git
+ > git.exe --version # timeout=10
+ > git --version # 'git version 2.54.0.windows.1'
+ > git.exe fetch --tags --force --progress -- https://github.com/juansebastian-br/CI-CD-with-jenkins.git +refs/heads/*:refs/remotes/origin/* # timeout=10
+ > git.exe rev-parse "refs/remotes/origin/main^{commit}" # timeout=10
+Checking out Revision d12ddc254ba0cff0d4f4b1f2dc08ee2264df8a38 (refs/remotes/origin/main)
+ > git.exe config core.sparsecheckout # timeout=10
+ > git.exe checkout -f d12ddc254ba0cff0d4f4b1f2dc08ee2264df8a38 # timeout=10
+ > git.exe branch -a -v --no-abbrev # timeout=10
+ > git.exe branch -D main # timeout=10
+ > git.exe checkout -b main d12ddc254ba0cff0d4f4b1f2dc08ee2264df8a38 # timeout=10
+Commit message: "Correction on stage run container locally"
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] stage
+[Pipeline] { (Build Docker image)
+[Pipeline] script
+[Pipeline] {
+[Pipeline] }
+[Pipeline] // script
+[Pipeline] bat
+
+C:\ProgramData\Jenkins\.jenkins\workspace\WebAppPipeline>docker build -t cicd-lab-webapp:9 . 
+DEPRECATED: The legacy builder is deprecated and will be removed in a future release.
+            Install the buildx component to build images with BuildKit:
+            https://docs.docker.com/go/buildx/
+
+Sending build context to Docker daemon  19.97kB
+Step 1/9 : FROM node:20-alpine
+ ---> fb4cd12c85ee
+Step 2/9 : WORKDIR /app
+ ---> Using cache
+ ---> 74c9ae718bb9
+Step 3/9 : COPY package.json ./
+ ---> Using cache
+ ---> 86956b8a69f6
+Step 4/9 : RUN npm install --omit=dev
+ ---> Using cache
+ ---> f5cdafd73dc7
+Step 5/9 : COPY src ./src
+ ---> Using cache
+ ---> 25cfd378074c
+Step 6/9 : ENV NODE_ENV=production
+ ---> Using cache
+ ---> 9d6cacb8c7cc
+Step 7/9 : ENV PORT=3000
+ ---> Using cache
+ ---> 4ecfdf1595ae
+Step 8/9 : EXPOSE 3000
+ ---> Using cache
+ ---> 1abbe8ba2abd
+Step 9/9 : CMD ["npm", "start"]
+ ---> Using cache
+ ---> 219ed9d70c65
+Successfully built 219ed9d70c65
+Successfully tagged cicd-lab-webapp:9
+
+C:\ProgramData\Jenkins\.jenkins\workspace\WebAppPipeline>docker tag cicd-lab-webapp:9 cicd-lab-webapp:latest 
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] stage
+[Pipeline] { (Validate Docker image)
+[Pipeline] bat
+
+C:\ProgramData\Jenkins\.jenkins\workspace\WebAppPipeline>docker image inspect cicd-lab-webapp:9 
+[
+    {
+        "Architecture": "amd64",
+        "Config": {
+            "Cmd": [
+                "npm",
+                "start"
+            ],
+            "Entrypoint": [
+                "docker-entrypoint.sh"
+            ],
+            "Env": [
+                "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
+                "NODE_VERSION=20.20.2",
+                "YARN_VERSION=1.22.22",
+                "NODE_ENV=production",
+                "PORT=3000"
+            ],
+            "ExposedPorts": {
+                "3000/tcp": {}
+            },
+            "WorkingDir": "/app"
+        },
+        "Created": "2026-08-09T21:38:19.477193757Z",
+        "Descriptor": {
+            "digest": "sha256:219ed9d70c65962014ed3329e16e73cebd28bdb5f20b9710639abde772d8cc05",
+            "mediaType": "application/vnd.oci.image.manifest.v1+json",
+            "size": 2054
+        },
+        "Id": "sha256:219ed9d70c65962014ed3329e16e73cebd28bdb5f20b9710639abde772d8cc05",
+        "Metadata": {
+            "LastTagTime": "2026-08-09T21:43:49.769180946Z"
+        },
+        "Os": "linux",
+        "Parent": "sha256:1abbe8ba2abdaa40e8fe18fd46590ad5566dfd1dd6750801907825d9e26d8284",
+        "RepoDigests": [
+            "cicd-lab-webapp@sha256:219ed9d70c65962014ed3329e16e73cebd28bdb5f20b9710639abde772d8cc05"
+        ],
+        "RepoTags": [
+            "cicd-lab-webapp:8",
+            "cicd-lab-webapp:9",
+            "cicd-lab-webapp:latest"
+        ],
+        "RootFS": {
+            "Layers": [
+                "sha256:29df493baa13de438d6d2ece3a8333032e0b7b9b9d8cce4ee82194da255f61e1",
+                "sha256:4983b93ee7967564f02cbf6162b75010ce557404a539fba05ee19a0eae01acbc",
+                "sha256:e10358715ead9b47009dd04bcd77ac1c8e247f7249ab06517ff913c473a8e38e",
+                "sha256:afa543f85b4685a84338df3e2c429edca49bb372b0f49e0c5cc9724c820ad094",
+                "sha256:e0b823f3b8ed7561b4a4f7243d804fd0a112fbb64600ac7704b4dcffb9432d25",
+                "sha256:4cfc81abcdbbbb94fe75ff87b7fb8269494686c0a4d49e43f1e5341f3f80af70",
+                "sha256:03d3fad8129b7b6778f67e35a71af308521d1926d812e8a35aff01e57294fc60",
+                "sha256:23421b90e3303d2d9541aea860ab33d55c6e5bd5194c8e57dbfa7bd72cb6db06"
+            ],
+            "Type": "layers"
+        },
+        "Size": 70754873
+    }
+]
+
+C:\ProgramData\Jenkins\.jenkins\workspace\WebAppPipeline>docker image inspect cicd-lab-webapp:latest 
+[
+    {
+        "Architecture": "amd64",
+        "Config": {
+            "Cmd": [
+                "npm",
+                "start"
+            ],
+            "Entrypoint": [
+                "docker-entrypoint.sh"
+            ],
+            "Env": [
+                "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
+                "NODE_VERSION=20.20.2",
+                "YARN_VERSION=1.22.22",
+                "NODE_ENV=production",
+                "PORT=3000"
+            ],
+            "ExposedPorts": {
+                "3000/tcp": {}
+            },
+            "WorkingDir": "/app"
+        },
+        "Created": "2026-08-09T21:38:19.477193757Z",
+        "Descriptor": {
+            "digest": "sha256:219ed9d70c65962014ed3329e16e73cebd28bdb5f20b9710639abde772d8cc05",
+            "mediaType": "application/vnd.oci.image.manifest.v1+json",
+            "size": 2054
+        },
+        "Id": "sha256:219ed9d70c65962014ed3329e16e73cebd28bdb5f20b9710639abde772d8cc05",
+        "Metadata": {
+            "LastTagTime": "2026-08-09T21:43:49.769180946Z"
+        },
+        "Os": "linux",
+        "Parent": "sha256:1abbe8ba2abdaa40e8fe18fd46590ad5566dfd1dd6750801907825d9e26d8284",
+        "RepoDigests": [
+            "cicd-lab-webapp@sha256:219ed9d70c65962014ed3329e16e73cebd28bdb5f20b9710639abde772d8cc05"
+        ],
+        "RepoTags": [
+            "cicd-lab-webapp:8",
+            "cicd-lab-webapp:9",
+            "cicd-lab-webapp:latest"
+        ],
+        "RootFS": {
+            "Layers": [
+                "sha256:29df493baa13de438d6d2ece3a8333032e0b7b9b9d8cce4ee82194da255f61e1",
+                "sha256:4983b93ee7967564f02cbf6162b75010ce557404a539fba05ee19a0eae01acbc",
+                "sha256:e10358715ead9b47009dd04bcd77ac1c8e247f7249ab06517ff913c473a8e38e",
+                "sha256:afa543f85b4685a84338df3e2c429edca49bb372b0f49e0c5cc9724c820ad094",
+                "sha256:e0b823f3b8ed7561b4a4f7243d804fd0a112fbb64600ac7704b4dcffb9432d25",
+                "sha256:4cfc81abcdbbbb94fe75ff87b7fb8269494686c0a4d49e43f1e5341f3f80af70",
+                "sha256:03d3fad8129b7b6778f67e35a71af308521d1926d812e8a35aff01e57294fc60",
+                "sha256:23421b90e3303d2d9541aea860ab33d55c6e5bd5194c8e57dbfa7bd72cb6db06"
+            ],
+            "Type": "layers"
+        },
+        "Size": 70754873
+    }
+]
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] stage
+[Pipeline] { (Run container locally)
+[Pipeline] bat
+
+C:\ProgramData\Jenkins\.jenkins\workspace\WebAppPipeline>docker rm -f cicd-lab-webapp-test   2>NUL  || exit /b 0 
+
+C:\ProgramData\Jenkins\.jenkins\workspace\WebAppPipeline>docker run -d                       --name cicd-lab-webapp-test                       -p 3000:3000                       cicd-lab-webapp:9 
+d328985fe8281814557a94075ca0e90209a89fc1b8293812d6d48d6f7c8e0345
+
+C:\ProgramData\Jenkins\.jenkins\workspace\WebAppPipeline>powershell -Command "Start-Sleep -Seconds 5"  
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] stage
+[Pipeline] { (Smoke test)
+[Pipeline] bat
+
+C:\ProgramData\Jenkins\.jenkins\workspace\WebAppPipeline>curl --fail http://localhost:3000/health 
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0100    15  100    15    0     0    300      0 --:--:-- --:--:-- --:--:--   312
+{"status":"UP"}
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] stage
+[Pipeline] { (Declarative: Post Actions)
+[Pipeline] bat
+
+C:\ProgramData\Jenkins\.jenkins\workspace\WebAppPipeline>docker rm -f cicd-lab-webapp-test   2>NUL  || exit /b 0 
+cicd-lab-webapp-test
+[Pipeline] echo
+Pipeline completado correctamente.
+[Pipeline] echo
+Imagen creada: cicd-lab-webapp:9
+[Pipeline] echo
+Imagen latest: cicd-lab-webapp:latest
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] }
+[Pipeline] // withEnv
+[Pipeline] }
+[Pipeline] // withEnv
+[Pipeline] }
+[Pipeline] // node
+[Pipeline] End of Pipeline
+Finished: SUCCESS

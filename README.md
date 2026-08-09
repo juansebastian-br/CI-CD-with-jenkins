@@ -185,8 +185,6 @@ Guardar como:
 capturas/jenkins-cd.png
 ```
 
-Para el laboratorio descrito, la definicion de los stages de Jenkins es el elemento evaluado aunque la publicacion real no se complete.
-
 ## Entregables incluidos
 
 - Codigo fuente.
