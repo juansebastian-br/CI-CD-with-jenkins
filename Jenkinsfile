@@ -23,6 +23,19 @@ pipeline {
 
     stages {
 
+        stage('Check environment') {
+            steps {
+                bat '''
+                    echo PATH=%PATH%
+                    where git
+                    git --version
+                    where docker
+                    docker --version
+                    whoami
+                '''
+            }
+        }
+
         stage('Clone repository') {
             steps {
                 git branch: "${params.GIT_BRANCH}",
