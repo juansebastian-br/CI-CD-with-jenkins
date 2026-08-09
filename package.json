@@ -1,0 +1,22 @@
+{
+  "name": "cicd-lab-webapp",
+  "version": "1.0.0",
+  "description": "Aplicacion web minima para laboratorio CI/CD con GitHub Actions y Jenkins",
+  "main": "src/app.js",
+  "scripts": {
+    "start": "node src/app.js",
+    "test": "jest --runInBand",
+    "lint": "eslint src test"
+  },
+  "dependencies": {
+    "express": "^4.21.2"
+  },
+  "devDependencies": {
+    "eslint": "^9.18.0",
+    "jest": "^29.7.0",
+    "supertest": "^7.0.0"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

@@ -1,0 +1,40 @@
+name: CI - Build, Test and Validate
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+  pull_request:
+    branches:
+      - main
+      - develop
+
+permissions:
+  contents: read
+
+jobs:
+  ci:
+    name: CI
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v4
+
+      - name: Configure Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Static code analysis
+        run: npm run lint
+
+      - name: Run tests
+        run: npm test
+
+      - name: Validate Docker build
+        run: docker build -t cicd-lab-webapp:${{ github.sha }} .
