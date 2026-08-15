@@ -30,10 +30,26 @@ pipeline {
 
         stage('Clone repository') {
             steps {
-                echo "Clonando repositorio..."
-                
+                echo "======================================"
+                echo "CLONANDO REPOSITORIO"
+                echo "======================================"
+
                 git branch: "${params.GIT_BRANCH}",
                     url: "${params.GIT_REPOSITORY}"
+            }
+        }
+
+        stage('Check Docker') {
+            steps {
+                sh '''
+                    echo "======================================"
+                    echo "VERIFICANDO DOCKER"
+                    echo "======================================"
+
+                    whoami
+                    docker --version
+                    docker ps -a
+                '''
             }
         }
 
@@ -45,14 +61,17 @@ pipeline {
                 }
 
                 sh '''
-                    set -e
-
-                    echo "Construyendo imagen Docker: ${FULL_IMAGE}"
+                    echo "======================================"
+                    echo "CONSTRUYENDO IMAGEN"
+                    echo "======================================"
 
                     docker build \
                         -t ${FULL_IMAGE} \
                         -t ${IMAGE_NAME}:latest \
                         .
+
+                    echo "Imagen creada:"
+                    docker images ${IMAGE_NAME}
                 '''
             }
         }
@@ -60,85 +79,78 @@ pipeline {
         stage('Validate Docker image') {
             steps {
                 sh '''
-                    set -e
+                    echo "======================================"
+                    echo "VALIDANDO IMAGEN"
+                    echo "======================================"
 
-                    echo "Validando imagen Docker..."
+                    docker image inspect ${FULL_IMAGE}
 
-                    docker image inspect ${FULL_IMAGE} > /dev/null
-                    docker image inspect ${IMAGE_NAME}:latest > /dev/null
-
-                    echo "Imagen validada correctamente:"
-                    docker images ${IMAGE_NAME}
+                    echo "Imagen válida."
                 '''
             }
         }
 
-        stage('Clean previous container') {
+        stage('Remove previous container') {
             steps {
                 sh '''
-                    echo "Eliminando contenedor anterior..."
+                    echo "======================================"
+                    echo "ELIMINANDO CONTENEDOR ANTERIOR"
+                    echo "======================================"
 
                     docker rm -f ${CONTAINER_NAME} 2>/dev/null || true
+
+                    echo "Contenedores actuales:"
+                    docker ps -a
                 '''
             }
         }
 
-        stage('Run container locally') {
+        stage('Run Docker container') {
             steps {
                 sh '''
-                    set -e
+                    echo "======================================"
+                    echo "EJECUTANDO DOCKER RUN"
+                    echo "======================================"
 
-                    echo "Iniciando contenedor..."
+                    echo "Imagen: ${FULL_IMAGE}"
+                    echo "Contenedor: ${CONTAINER_NAME}"
+                    echo "Puerto: ${APP_PORT}:${APP_PORT}"
 
                     docker run -d \
                         --name ${CONTAINER_NAME} \
                         -p ${APP_PORT}:${APP_PORT} \
                         ${FULL_IMAGE}
 
-                    echo "Contenedor iniciado."
+                    echo "======================================"
+                    echo "DOCKER RUN EJECUTADO"
+                    echo "======================================"
 
-                    docker ps --filter "name=${CONTAINER_NAME}"
-                '''
-            }
-        }
+                    docker ps -a
 
-        stage('Validate container port') {
-            steps {
-                sh '''
-                    set -e
-
-                    echo "Verificando publicación del puerto..."
+                    echo "======================================"
+                    echo "PUERTOS DEL CONTENEDOR"
+                    echo "======================================"
 
                     docker port ${CONTAINER_NAME}
-
-                    echo "Información de puertos:"
-                    docker inspect ${CONTAINER_NAME} \
-                        --format='{{json .NetworkSettings.Ports}}'
                 '''
             }
         }
 
-        stage('Wait for application') {
+        stage('Check container') {
             steps {
                 sh '''
-                    echo "Esperando que la aplicación esté disponible..."
+                    echo "======================================"
+                    echo "ESTADO DEL CONTENEDOR"
+                    echo "======================================"
 
-                    for i in $(seq 1 12); do
+                    docker ps -a \
+                        --filter "name=${CONTAINER_NAME}"
 
-                        if curl -sf http://localhost:${APP_PORT}/health > /dev/null; then
-                            echo "La aplicación está disponible."
-                            exit 0
-                        fi
+                    echo "======================================"
+                    echo "LOGS DEL CONTENEDOR"
+                    echo "======================================"
 
-                        echo "Intento $i/12: aplicación todavía no disponible..."
-                        sleep 5
-                    done
-
-                    echo "La aplicación no respondió después de 60 segundos."
-                    echo "Mostrando logs del contenedor:"
-                    docker logs ${CONTAINER_NAME}
-
-                    exit 1
+                    docker logs ${CONTAINER_NAME} 2>&1 || true
                 '''
             }
         }
@@ -146,16 +158,15 @@ pipeline {
         stage('Smoke test') {
             steps {
                 sh '''
-                    set -e
+                    echo "======================================"
+                    echo "SMOKE TEST"
+                    echo "======================================"
 
-                    echo "Ejecutando Smoke Test..."
+                    sleep 5
 
                     curl --fail \
                         --show-error \
                         http://localhost:${APP_PORT}/health
-
-                    echo ""
-                    echo "Smoke Test exitoso."
                 '''
             }
         }
@@ -163,39 +174,37 @@ pipeline {
 
     post {
 
-        always {
-            echo "Información final del contenedor:"
-
-            sh '''
-                docker ps -a --filter "name=${CONTAINER_NAME}" || true
-            '''
-
-            echo "Logs del contenedor:"
-
-            sh '''
-                docker logs ${CONTAINER_NAME} 2>&1 || true
-            '''
-
-            echo "Eliminando contenedor..."
-
-            sh '''
-                docker rm -f ${CONTAINER_NAME} 2>/dev/null || true
-            '''
-        }
-
         success {
             echo "======================================"
-            echo "Pipeline completado correctamente."
+            echo "PIPELINE EXITOSO"
             echo "======================================"
-            echo "Imagen creada: ${env.FULL_IMAGE}"
-            echo "Imagen latest: ${params.IMAGE_NAME}:latest"
+
+            sh '''
+                echo "Contenedor:"
+                docker ps -a --filter "name=${CONTAINER_NAME}"
+
+                echo "Puerto:"
+                docker port ${CONTAINER_NAME}
+
+                echo "Logs:"
+                docker logs ${CONTAINER_NAME} 2>&1 || true
+            '''
         }
 
         failure {
             echo "======================================"
-            echo "Pipeline fallido."
-            echo "Revisar los logs anteriores."
+            echo "PIPELINE FALLIDO"
             echo "======================================"
+
+            sh '''
+                echo "Contenedores:"
+                docker ps -a
+
+                echo "Logs del contenedor:"
+                docker logs ${CONTAINER_NAME} 2>&1 || true
+            '''
         }
+
+
     }
 }
