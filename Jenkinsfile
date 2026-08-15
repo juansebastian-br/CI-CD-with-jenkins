@@ -21,10 +21,6 @@ pipeline {
         )
     }
 
-    environment {
-        PATH = "C:\\Users\\ROGELIO\\AppData\\Local\\Programs\\DockerDesktop\\resources\\bin;${env.PATH}"
-    }   
-
 
     stages {
 
@@ -42,9 +38,9 @@ pipeline {
                     env.FULL_IMAGE = "${params.IMAGE_NAME}:${env.IMAGE_TAG}"
                 }
 
-                bat '''
-                    docker build -t %FULL_IMAGE% .
-                    docker tag %FULL_IMAGE% %IMAGE_NAME%:latest
+                sh '''
+                    docker build -t ${FULL_IMAGE} .
+                    docker tag ${FULL_IMAGE} ${IMAGE_NAME}:latest
                 '''
             }
         }
@@ -60,22 +56,22 @@ pipeline {
 
         stage('Run container locally') {
             steps {
-                bat '''
-                    docker rm -f cicd-lab-webapp-test 2>NUL || exit /b 0
-
-                    docker run -d ^
-                      --name cicd-lab-webapp-test ^
-                      -p 3000:3000 ^
-                      %FULL_IMAGE%
-
-                    powershell -Command "Start-Sleep -Seconds 5" 
+                sh '''
+                    docker rm -f cicd-lab-webapp-test 2>/dev/null || true
+ 
+                    docker run -d \
+                      --name cicd-lab-webapp-test \
+                      -p 3000:3000 \
+                      ${FULL_IMAGE}
+ 
+                    sleep 5
                 '''
             }
         }
 
         stage('Smoke test') {
             steps {
-                bat '''
+                sh '''
                     curl --fail http://localhost:3000/health
                 '''
             }
@@ -85,8 +81,8 @@ pipeline {
     post {
 
         always {
-            bat '''
-                docker rm -f cicd-lab-webapp-test 2>NUL || exit /b 0
+            sh '''
+                docker rm -f cicd-lab-webapp-test 2>/dev/null || true
             '''
         }
 
