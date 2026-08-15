@@ -47,9 +47,9 @@ pipeline {
 
         stage('Validate Docker image') {
             steps {
-                bat '''
-                    docker image inspect %FULL_IMAGE%
-                    docker image inspect %IMAGE_NAME%:latest
+                sh '''
+                    docker image inspect ${FULL_IMAGE}
+                    docker image inspect ${IMAGE_NAME}:latest
                 '''
             }
         }
