@@ -7,7 +7,7 @@ app.get("/", (req, res) => {
   res.status(200).json({
     application: "cicd-lab-webapp",
     status: "ok",
-    message: "CI/CD laboratory application"
+    message: "CI/CD laboratory application 1"
   });
 });
 
