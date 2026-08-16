@@ -170,39 +170,39 @@ pipeline {
                 '''
             }
         }
+
+        stage('Cleanup old images') {
+            steps {
+                sh '''
+                    echo "======================================"
+                    echo "LIMPIANDO IMÁGENES ANTIGUAS"
+                    echo "======================================"
+        
+                    CURRENT_BUILD=${BUILD_NUMBER}
+                    MIN_BUILD=$((CURRENT_BUILD - 2))
+        
+                    echo "Build actual: ${CURRENT_BUILD}"
+                    echo "Conservando builds: ${MIN_BUILD}, $((CURRENT_BUILD - 1)), ${CURRENT_BUILD}"
+        
+                    for TAG in $(docker images ${IMAGE_NAME} \
+                        --format '{{.Tag}}' \
+                        | grep -E '^[0-9]+$'); do
+        
+                        if [ "$TAG" -lt "$MIN_BUILD" ]; then
+                            echo "Eliminando: ${IMAGE_NAME}:${TAG}"
+                            docker rmi "${IMAGE_NAME}:${TAG}" || true
+                        fi
+                    done
+        
+                    echo "======================================"
+                    echo "IMÁGENES DESPUÉS DE LA LIMPIEZA"
+                    echo "======================================"
+        
+                    docker images ${IMAGE_NAME}
+                '''
+            }
+        }
     }
-
-    stage('Cleanup old images') {
-    steps {
-        sh '''
-            echo "======================================"
-            echo "LIMPIANDO IMÁGENES ANTIGUAS"
-            echo "======================================"
-
-            CURRENT_BUILD=${BUILD_NUMBER}
-            MIN_BUILD=$((CURRENT_BUILD - 2))
-
-            echo "Build actual: ${CURRENT_BUILD}"
-            echo "Conservando builds: ${MIN_BUILD}, $((CURRENT_BUILD - 1)), ${CURRENT_BUILD}"
-
-            for TAG in $(docker images ${IMAGE_NAME} \
-                --format '{{.Tag}}' \
-                | grep -E '^[0-9]+$'); do
-
-                if [ "$TAG" -lt "$MIN_BUILD" ]; then
-                    echo "Eliminando: ${IMAGE_NAME}:${TAG}"
-                    docker rmi "${IMAGE_NAME}:${TAG}" || true
-                fi
-            done
-
-            echo "======================================"
-            echo "IMÁGENES DESPUÉS DE LA LIMPIEZA"
-            echo "======================================"
-
-            docker images ${IMAGE_NAME}
-        '''
-    }
-}
 
     post {
 
